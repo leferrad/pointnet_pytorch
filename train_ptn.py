@@ -3,7 +3,6 @@ from __future__ import print_function
 
 import numpy as np
 import os
-import sys
 import argparse
 from datetime import datetime
 
@@ -24,6 +23,7 @@ def main():
     parser.add_argument('--weight_file', default='', help='weights to load')
     parser.add_argument('--test_area', type=int, default=5, help='Which area to use for test, option: 1-6 [default: 6]')
     parser.add_argument('--num_point', type=int, default=4096, help='Point number [default: 4096]')
+    parser.add_argument('--gpu', type=str, default='', help='GPU to use [default: ""]')
 
     args = parser.parse_args()
     NUM_POINT = args.num_point
@@ -31,6 +31,7 @@ def main():
     lr = args.lr
     ALL_FILES = getDataFiles('indoor3d_sem_seg_hdf5_data/all_files.txt')
     room_filelist = [line.rstrip() for line in open('indoor3d_sem_seg_hdf5_data/room_filelist.txt')]
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 
     # Load ALL data
     data_batch_list = []
@@ -73,11 +74,10 @@ def main():
     epochs = args.epochs
 
     model = get_model()
-    model.cuda()
     # print(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr)
-    criterion = nn.CrossEntropyLoss().cuda()
+    criterion = nn.CrossEntropyLoss()
 
     if args.weight_file != '':
         pre_trained_model = torch.load(args.weight_file)
@@ -106,9 +106,9 @@ def main():
             label = train_label_shuffled[start_idx:end_idx]
 
             feature = np.expand_dims(feature, axis=1)
-            input = Variable(torch.from_numpy(feature).cuda(), requires_grad=True)
+            input = Variable(torch.from_numpy(feature), requires_grad=True)
             input = torch.transpose(input, 3, 1)
-            target = Variable(torch.from_numpy(label).cuda(), requires_grad=False)
+            target = Variable(torch.from_numpy(label), requires_grad=False)
             target = target.view(-1,)
             output = model(input)
             output_reshaped = output.permute(0, 3, 2, 1).contiguous().view(-1, 13)
@@ -154,9 +154,9 @@ def main():
             label = test_label[start_idx:end_idx]
 
             feature = np.expand_dims(feature, axis=1)
-            input = Variable(torch.from_numpy(feature).cuda(), requires_grad=True)
+            input = Variable(torch.from_numpy(feature), requires_grad=True)
             input = torch.transpose(input, 3, 1)
-            target = Variable(torch.from_numpy(label).cuda(), requires_grad=False)
+            target = Variable(torch.from_numpy(label), requires_grad=False)
             target = target.view(-1,)
             output = model(input)
             output_reshaped = output.permute(0, 3, 2, 1).contiguous().view(-1, 13)
