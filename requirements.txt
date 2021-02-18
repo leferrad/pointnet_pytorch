@@ -1,0 +1,5 @@
+numpy==1.19.5
+torch==1.7.1
+h5py==3.1.0
+plyfile==0.7.3
+tensorboardx==2.1
