@@ -19,7 +19,7 @@ def main():
     parser = argparse.ArgumentParser(description='Voxelnet for semantic')
     parser.add_argument('--lr', default=0.001, type=float, help='Initial learning rate')
     parser.add_argument('--epochs', default=100, help='epochs')
-    parser.add_argument('--batchsize', default=32, help='epochs')
+    parser.add_argument('--batchsize', default=64, help='batch size')
     parser.add_argument('--weight_file', default='', help='weights to load')
     parser.add_argument('--test_area', type=int, default=5, help='Which area to use for test, option: 1-6 [default: 6]')
     parser.add_argument('--num_point', type=int, default=4096, help='Point number [default: 4096]')
@@ -115,8 +115,8 @@ def main():
 
             loss = criterion(output_reshaped, target)
             prec1 = accuracy(output_reshaped.data, target.data, topk=(1,))
-            prec1[0] = prec1[0].cpu().numpy()[0]
-            losses.update(loss.data[0], BATCH_SIZE)
+            prec1[0] = prec1[0].cpu().numpy()
+            losses.update(loss.item(), BATCH_SIZE)
             top1.update(prec1[0], BATCH_SIZE)
 
             optimizer.zero_grad()
@@ -163,8 +163,8 @@ def main():
 
             loss = criterion(output_reshaped, target)
             prec1 = accuracy(output_reshaped.data, target.data, topk=(1,))
-            prec1[0] = prec1[0].cpu().numpy()[0]
-            losses.update(loss.data[0], BATCH_SIZE)
+            prec1[0] = prec1[0].cpu().numpy()
+            losses.update(loss.item(), BATCH_SIZE)
             top1.update(prec1[0], BATCH_SIZE)
 
         writer.add_scalar('val/loss', losses.avg, global_counter)

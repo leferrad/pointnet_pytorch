@@ -18,7 +18,7 @@ from utils.train_utils import AverageMeter, accuracy
 from utils.indoor3d_util import room2blocks_wrapper_normalized, g_label2color
 
 parser = argparse.ArgumentParser(description='Voxelnet for semantic')
-parser.add_argument('--batchsize', default=1, help='epochs')
+parser.add_argument('--batchsize', default=1, help='batch size')
 parser.add_argument('--weight_file', default='', help='weights to load')
 parser.add_argument('--test_area', type=int, default=5, help='Which area to use for test, option: 1-6 [default: 6]')
 parser.add_argument('--num_point', type=int, default=4096, help='Point number [default: 4096]')
@@ -94,8 +94,8 @@ def evaluate(room_path, out_data_label_filename, out_gt_label_filename):
 
         loss = criterion(output_reshaped, target)
         prec1 = accuracy(output_reshaped.data, target.data, topk=(1,))
-        prec1[0] = prec1[0].cpu().numpy()[0]
-        losses.update(loss.data[0], BATCH_SIZE)
+        prec1[0] = prec1[0].cpu().numpy()
+        losses.update(loss.item(), BATCH_SIZE)
         top1.update(prec1[0], BATCH_SIZE)
 
         pred_label = np.reshape(np.argmax(output_reshaped.data.cpu().numpy(), axis=1), (BATCH_SIZE,-1))
