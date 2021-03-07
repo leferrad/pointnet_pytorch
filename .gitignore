@@ -9,3 +9,5 @@ data_preparation/indoor3d_sem_seg_hdf5_data/
 data_preparation/s3dis_npy/
 data_preparation/Stanford3dDataset_v1.2_Aligned_Version/
 *.pyc
+
+venv/*
